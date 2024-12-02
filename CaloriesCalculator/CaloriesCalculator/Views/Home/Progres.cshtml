@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Progres";
+}
+
+
+
+    <h1 class="mt-5">Проследяване на Седмичен Прогрес</h1>
+
+    
+    <div class="card">
+        <div class="card-body">
+            <h2>Вашите Калории:</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Ден</th>
+                        <th>Консумирани Калории</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="calorieTableBody">
+                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+    <div class="card">
+        <div class="card-body">
+            <h2>Седмична Цел:</h2>
+            <p id="weeklyGoalDisplay">Цел за седмицата: <span id="currentGoalDisplay">0</span> калории</p>
+            <button class="btn btn-info" id="editGoalButton">Редактиране на целта</button>
+            <form id="goalForm" style="display: none;">
+                <div class="input-group mb-3">
+                    <input type="number" class="form-control" id="weeklyGoal" placeholder="Седмична цел в калории" required>
+                    <button class="btn btn-custom" type="submit">Запази Цел</button>
+                </div>
+            </form>
+            <p class="error-message" id="goalError" style="display: none;">Прогресът не може да надвишава 100%!</p>
+        </div>
+    </div>
+
+    
+    <div class="card">
+        <div class="card-body">
+            <h2>Прогрес за Седмицата:</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar" style="width: 0;"></div>
+            </div>
+            <p class="progress-summary" id="progressSummary">Прогрес: 0%</p>
+        </div>
+    </div>
+
+    
+    <div class="card">
+        <div class="card-body">
+            <h3>Добавете Вашите Калории за Днес:</h3>
+            <form id="caloriesForm">
+                <div class="input-group mb-3">
+                    <input type="number" step="0.1" class="form-control" id="calories" placeholder="Въведете калории за днес" required>
+                    <button class="btn btn-custom" type="submit">Добави Калории</button>
+                </div>
+            </form>
+            <p id="missedDayMessage" style="color: red; display: none;">Пропуснат ден! Моля, добавете калории за този ден.</p>
+           <p id="errorMessage" style="display: none; color: red; margin-bottom: 10px;"></p>
+
+        </div>
+    </div>
+
+
+
+
+
+
+
