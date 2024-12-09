@@ -5,11 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
+    public DbSet<UserSettings> UserSettings { get; set; }
+    public DbSet<ProgressEntry> ProgressEntries { get; set; }
     public DbSet<FoodProduct> FoodProducts { get; set; }
-    public DbSet<Meal> Meals { get; set; }
-    public DbSet<MealFoodProduct> MealFoodProducts { get; set; }
     public DbSet<Category> Categories { get; set; }
-    public DbSet<UserSettings> UserSettings { get; set; } 
+    public DbSet<AdminAction> AdminActions { get; set; }
+    public DbSet<UserProgress> UserProgress { get; set; }
+
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -20,30 +22,50 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<MealFoodProduct>()
-            .HasKey(mf => new { mf.MealId, mf.FoodProductId });
-
-        modelBuilder.Entity<MealFoodProduct>()
-            .HasOne(mf => mf.Meal)
-            .WithMany(m => m.MealFoodProducts)
-            .HasForeignKey(mf => mf.MealId);
-
-        modelBuilder.Entity<MealFoodProduct>()
-            .HasOne(mf => mf.FoodProduct)
-            .WithMany(f => f.MealFoodProducts)
-            .HasForeignKey(mf => mf.FoodProductId);
-
-       
-        modelBuilder.Entity<FoodProduct>()
-            .Property(f => f.Protein)
-            .HasPrecision(18, 4);
 
         modelBuilder.Entity<FoodProduct>()
-            .Property(f => f.Carbs)
-            .HasPrecision(18, 4);
+            .HasOne(fp => fp.Category)
+            .WithMany(c => c.FoodProducts)
+            .HasForeignKey(fp => fp.CategoryId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<FoodProduct>()
-            .Property(f => f.Fat)
-            .HasPrecision(18, 4);
+
+        modelBuilder.Entity<UserSettings>()
+            .HasOne(us => us.User)
+            .WithMany()
+            .HasForeignKey(us => us.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+        modelBuilder.Entity<ProgressEntry>()
+            .HasOne(pe => pe.User)
+            .WithMany()
+            .HasForeignKey(pe => pe.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+        modelBuilder.Entity<AdminAction>()
+            .HasOne(aa => aa.Admin)
+            .WithMany()
+            .HasForeignKey(aa => aa.AdminId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<UserProgress>()
+            .HasOne(up => up.User)
+            .WithMany()
+            .HasForeignKey(up => up.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        base.OnModelCreating(modelBuilder);
+
+        // Добавяне на уникален индекс за комбинацията от UserId и Date
+        modelBuilder.Entity<UserProgress>()
+            .HasIndex(up => new { up.UserId, up.Date })
+            .IsUnique();
     }
+
 }
+
+

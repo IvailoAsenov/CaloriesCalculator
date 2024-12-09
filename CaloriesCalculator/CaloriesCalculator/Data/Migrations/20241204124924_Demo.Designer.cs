@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CaloriesCalculator.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241201154307_Demo")]
+    [Migration("20241204124924_Demo")]
     partial class Demo
     {
         /// <inheritdoc />
@@ -23,6 +23,36 @@ namespace CaloriesCalculator.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("CaloriesCalculator.Models.AdminAction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ActionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AdminId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.ToTable("AdminActions");
+                });
 
             modelBuilder.Entity("CaloriesCalculator.Models.Category", b =>
                 {
@@ -56,24 +86,12 @@ namespace CaloriesCalculator.Data.Migrations
                     b.Property<decimal>("Calories")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("Carbs")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Fat")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Protein")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
@@ -82,7 +100,7 @@ namespace CaloriesCalculator.Data.Migrations
                     b.ToTable("FoodProducts");
                 });
 
-            modelBuilder.Entity("CaloriesCalculator.Models.Meal", b =>
+            modelBuilder.Entity("CaloriesCalculator.Models.ProgressEntry", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -90,32 +108,21 @@ namespace CaloriesCalculator.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Calories")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Meals");
-                });
+                    b.HasIndex("UserId");
 
-            modelBuilder.Entity("CaloriesCalculator.Models.MealFoodProduct", b =>
-                {
-                    b.Property<int>("MealId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FoodProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("MealId", "FoodProductId");
-
-                    b.HasIndex("FoodProductId");
-
-                    b.ToTable("MealFoodProducts");
+                    b.ToTable("ProgressEntries");
                 });
 
             modelBuilder.Entity("CaloriesCalculator.Models.UserSettings", b =>
@@ -345,6 +352,17 @@ namespace CaloriesCalculator.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("CaloriesCalculator.Models.AdminAction", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
+                });
+
             modelBuilder.Entity("CaloriesCalculator.Models.FoodProduct", b =>
                 {
                     b.HasOne("CaloriesCalculator.Models.Category", "Category")
@@ -356,23 +374,15 @@ namespace CaloriesCalculator.Data.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("CaloriesCalculator.Models.MealFoodProduct", b =>
+            modelBuilder.Entity("CaloriesCalculator.Models.ProgressEntry", b =>
                 {
-                    b.HasOne("CaloriesCalculator.Models.FoodProduct", "FoodProduct")
-                        .WithMany("MealFoodProducts")
-                        .HasForeignKey("FoodProductId")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CaloriesCalculator.Models.Meal", "Meal")
-                        .WithMany("MealFoodProducts")
-                        .HasForeignKey("MealId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FoodProduct");
-
-                    b.Navigation("Meal");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CaloriesCalculator.Models.UserSettings", b =>
@@ -440,16 +450,6 @@ namespace CaloriesCalculator.Data.Migrations
             modelBuilder.Entity("CaloriesCalculator.Models.Category", b =>
                 {
                     b.Navigation("FoodProducts");
-                });
-
-            modelBuilder.Entity("CaloriesCalculator.Models.FoodProduct", b =>
-                {
-                    b.Navigation("MealFoodProducts");
-                });
-
-            modelBuilder.Entity("CaloriesCalculator.Models.Meal", b =>
-                {
-                    b.Navigation("MealFoodProducts");
                 });
 #pragma warning restore 612, 618
         }

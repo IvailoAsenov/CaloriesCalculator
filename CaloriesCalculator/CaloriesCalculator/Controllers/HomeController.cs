@@ -7,10 +7,12 @@ namespace CaloriesCalculator.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext data;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext _data)
         {
             _logger = logger;
+            data = _data;
         }
 
         public IActionResult Index()
@@ -20,6 +22,8 @@ namespace CaloriesCalculator.Controllers
 
         public IActionResult Progres()
         {
+            var model = 
+
             return View();
         }
 
