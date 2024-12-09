@@ -38,7 +38,6 @@ namespace CaloriesCalculator.Controllers
             // Връщаме данните към изгледа
             return View(new UserProgress
             {
-                Progress = progress,
                 WeeklyGoal = weeklyGoal
             });
         }
