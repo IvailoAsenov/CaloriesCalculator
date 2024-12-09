@@ -1,7 +1,7 @@
-﻿using CaloriesCalculator.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
@@ -10,36 +10,34 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
     }
 
+    public DbSet<AdminActions> AdminActions { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<FoodProduct> FoodProducts { get; set; }
+    public DbSet<ProgressEntry> ProgressEntries { get; set; }
+    public DbSet<UserProgress> UserProgress { get; set; }
+    public DbSet<UserSettings> UserSettings { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<FoodProduct>()
-            .HasOne(fp => fp.Category)
-            .WithMany(c => c.FoodProducts)
-            .HasForeignKey(fp => fp.CategoryId)
+        // Configuring relationships
+        modelBuilder.Entity<AdminActions>()
+            .HasOne(a => a.Admin)
+            .WithMany()
+            .HasForeignKey(a => a.AdminId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<FoodProduct>()
-            .Property(fp => fp.Calories)
-            .HasColumnType("decimal(10,2)");
-
-        modelBuilder.Entity<UserSettings>()
-            .HasOne(us => us.User)
-            .WithMany()
-            .HasForeignKey(us => us.UserId)
+            .HasOne(p => p.Category)
+            .WithMany(c => c.FoodProducts)
+            .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<ProgressEntry>()
-            .HasOne(pe => pe.User)
-            .WithMany()
-            .HasForeignKey(pe => pe.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<AdminAction>()
-            .HasOne(aa => aa.Admin)
-            .WithMany()
-            .HasForeignKey(aa => aa.AdminId)
+            .HasOne(p => p.UserProgress)
+            .WithMany(up => up.ProgressEntries)
+            .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<UserProgress>()
@@ -48,19 +46,11 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .HasForeignKey(up => up.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<UserProgress>()
-            .HasIndex(up => new { up.UserId, up.Date })
-            .IsUnique();
-
-        modelBuilder.Entity<AdminAction>()
-            .HasIndex(aa => aa.AdminId);
+        modelBuilder.Entity<UserSettings>()
+            .HasOne(us => us.User)
+            .WithMany()
+            .HasForeignKey(us => us.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
-
-
-    public DbSet<UserSettings> UserSettings { get; set; }
-    public DbSet<ProgressEntry> ProgressEntries { get; set; }
-    public DbSet<FoodProduct> FoodProducts { get; set; }
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<AdminAction> AdminActions { get; set; }
-    public DbSet<UserProgress> UserProgress { get; set; }
 }
+
